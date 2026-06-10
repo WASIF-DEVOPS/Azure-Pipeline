@@ -1,0 +1,73 @@
+trigger:
+  branches:
+    include:
+      - main
+
+variables:
+  IMAGE_NAME: '<your-dockerhub-username>/boardshack'
+  IMAGE_TAG: '$(Build.BuildId)'
+  AZURE_APP_NAME: 'boardgame-app'   # must match your App Service name
+
+stages:
+
+# ─── Stage 1: Build & Test ───────────────────────────────────────
+- stage: Build
+  jobs:
+  - job: BuildAndTest
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+
+    - task: Maven@4
+      displayName: 'Maven Build & Test'
+      inputs:
+        mavenPomFile: 'pom.xml'
+        goals: 'clean package'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.17'
+
+    # Save the built JAR for next stage
+    - publish: '$(System.DefaultWorkingDirectory)'
+      artifact: source
+
+# ─── Stage 2: Docker Build & Push to Docker Hub ──────────────────
+- stage: DockerBuild
+  dependsOn: Build
+  jobs:
+  - job: DockerPush
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+
+    - download: current
+      artifact: source
+
+    - task: Docker@2
+      displayName: 'Build and Push to Docker Hub'
+      inputs:
+        containerRegistry: 'docker-connection'   # your Docker Hub service connection
+        repository: '$(IMAGE_NAME)'
+        command: 'buildAndPush'
+        Dockerfile: '$(Pipeline.Workspace)/source/Dockerfile'
+        buildContext: '$(Pipeline.Workspace)/source'
+        tags: |
+          $(IMAGE_TAG)
+          latest
+
+# ─── Stage 3: Deploy to Azure App Service (Free Tier) ────────────
+- stage: Deploy
+  dependsOn: DockerBuild
+  jobs:
+  - job: DeployApp
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+
+    - task: AzureWebAppContainer@1
+      displayName: 'Deploy to Azure App Service'
+      inputs:
+        azureSubscription: 'azure-connection'     # your Azure service connection
+        appName: '$(AZURE_APP_NAME)'
+        containers: '$(IMAGE_NAME):$(IMAGE_TAG)'
