@@ -1,0 +1,6 @@
+subscription_id       = "d08ce3dc-e84b-4c2b-a94d-94c01f285210"
+resource_group_name   = "boardgame-rg"
+location              = "Central US"
+app_service_plan_name = "boardgame-plan"
+app_service_name      = "boardgame-app"
+docker_image          = "wassifstalker/boardshack:latest"
