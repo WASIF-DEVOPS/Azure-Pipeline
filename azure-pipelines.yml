@@ -4,7 +4,7 @@ trigger:
       - main
 
 variables:
-  IMAGE_NAME: '<your-dockerhub-username>/boardshack'
+  IMAGE_NAME: 'wassifstalker/boardshack'
   IMAGE_TAG: '$(Build.BuildId)'
   AZURE_APP_NAME: 'boardgame-app'   # must match your App Service name
 
@@ -47,7 +47,7 @@ stages:
     - task: Docker@2
       displayName: 'Build and Push to Docker Hub'
       inputs:
-        containerRegistry: 'docker-connection'   # your Docker Hub service connection
+        containerRegistry: 'docker'
         repository: '$(IMAGE_NAME)'
         command: 'buildAndPush'
         Dockerfile: '$(Pipeline.Workspace)/source/Dockerfile'
@@ -68,6 +68,6 @@ stages:
     - task: AzureWebAppContainer@1
       displayName: 'Deploy to Azure App Service'
       inputs:
-        azureSubscription: 'azure-connection'     # your Azure service connection
+        azureSubscription: 'azure'
         appName: '$(AZURE_APP_NAME)'
         containers: '$(IMAGE_NAME):$(IMAGE_TAG)'
