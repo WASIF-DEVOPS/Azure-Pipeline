@@ -10,8 +10,36 @@
 
     <main class="container">
         <div class="p-4 p-md-5 mb-4 text-center">
-            <div class="container col-md-6">
-                <h1>Boardgame Lists</h1>
+            <div class="container col-md-8">
+
+                <!-- Hero Banner -->
+                <div class="hero-banner">
+                    <span class="pipeline-badge">🚀 Deployed via Azure DevOps</span>
+                    <h1>🎲 Boardgame Lists</h1>
+                    <p>Discover and review your favorite board games</p>
+                </div>
+
+                <!-- Stats Bar -->
+                <div class="stats-bar">
+                    <div class="row">
+                        <div class="col stat-item">
+                            <div class="stat-number">🎯</div>
+                            <div class="stat-label">CI/CD Pipeline</div>
+                        </div>
+                        <div class="col stat-item">
+                            <div class="stat-number">🐳</div>
+                            <div class="stat-label">Dockerized</div>
+                        </div>
+                        <div class="col stat-item">
+                            <div class="stat-number">☁️</div>
+                            <div class="stat-label">Azure Hosted</div>
+                        </div>
+                        <div class="col stat-item">
+                            <div class="stat-number">🏗️</div>
+                            <div class="stat-label">Terraform Infra</div>
+                        </div>
+                    </div>
+                </div>
 
                 <div id="error" class="error pt-3">
                     <div th:if="${userAddedMsg}">
